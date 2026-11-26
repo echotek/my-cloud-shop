@@ -1,4 +1,4 @@
-name: CI/CD — Сборка и публикация Docker-образа
+name: CI-CD Build and Push
 
 on:
   push:
@@ -12,28 +12,27 @@ jobs:
       packages: write
 
     steps:
-      - name: 1. Скачиваем код из репозитория
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: 2. Устанавливаем .NET 10
+      - name: Setup .NET 10
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
 
-      - name: 3. Проверяем сборку C# проекта
+      - name: Build .NET project
         run: dotnet build ./CloudShop/CloudShop.csproj --configuration Release
 
-      - name: 4. Авторизуемся в реестре контейнеров GitHub (GHCR)
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 5. Собираем и публикуем Docker-образ в облако
+      - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: ./CloudShop
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/my-cloud-shop:latest
-git add .
