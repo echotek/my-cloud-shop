@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Облачный Магазин</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 40px auto; background: #f4f6f9; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        input, button { padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; }
+        button { background: #2563eb; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        li { padding: 8px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🚀 Мой облачный магазин</h1>
+        <input id="name" placeholder="Название товара (например, Смартфон)" />
+        <input id="price" type="number" placeholder="Цена в рублях" />
+        <button onclick="addProduct()">Добавить в каталог</button>
+        <ul id="list"></ul>
+    </div>
+
+    <script>
+        async function loadProducts() {
+            const res = await fetch('/api/products');
+            const items = await res.json();
+            document.getElementById('list').innerHTML = items
+                .map(p => `<li><span>${p.name}</span><b>${p.price} ₽</b></li>`).join('');
+        }
+        async function addProduct() {
+            const name = document.getElementById('name').value;
+            const price = Number(document.getElementById('price').value);
+            if (!name) return;
+            await fetch('/api/products', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, price })
+            });
+            document.getElementById('name').value = '';
+            document.getElementById('price').value = '';
+            loadProducts();
+        }
+        loadProducts();
+    </script>
+</body>
+</html>

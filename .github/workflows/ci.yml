@@ -1,0 +1,24 @@
+name: Проверка сборки ASP.NET 10 и Docker
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Скачиваем код из репозитория
+        uses: actions/checkout@v4
+
+      - name: 2. Устанавливаем .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: 3. Проверяем сборку C# проекта
+        run: dotnet build ./CloudShop/CloudShop.csproj --configuration Release
+
+      - name: 4. Проверяем сборку Docker-образа
+        run: docker build -t cloud-shop-test ./CloudShop
